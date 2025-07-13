@@ -1,6 +1,7 @@
 # Ignore partition data
 /data/partition/
 /data/__pycache__/
+.*/__pycache__
 # Ignore all CSV and Parquet files
 *.csv
 *.parquet 

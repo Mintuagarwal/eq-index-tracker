@@ -53,18 +53,29 @@ def fetchStockDataSafe(ticker, startDate, endDate):
         hist = yf.download(ticker, start=startDate, end=endDate)
         hist.reset_index(inplace=True)
         hist["Ticker"] = ticker
-        list_of_cols = list(set([col[0] if isinstance(col, tuple) else col for col in hist.columns]))
+        col_set = set()
+        list_of_cols = []
+        for col in hist.columns:
+            if isinstance(col, tuple):
+                col = col[0]
+            if col not in col_set:
+                col_set.add(col)
+                list_of_cols.append(col)
         if set(list_of_cols) != set(LIST_OF_COLS):
             logging.info(f"list_of_cols is {list_of_cols}, expected: {LIST_OF_COLS}")
         hist.columns = list_of_cols
+        shares_out = yf.Ticker(ticker).info.get("sharesOutstanding", 0) or 1
         if 'Adj Close' not in hist.columns:
-            hist['Adj Close'] = hist['Close']
+            hist['Adj_Close'] = hist['Close']
+        else:
+            hist.rename(columns={'Adj Close': 'Adj_Close'}, inplace=True)
+        hist["Market_Cap"] = hist["Adj_Close"] * shares_out
         return hist
     except Exception as e:
         logger.info(f"Error fetching {ticker}: {e}")
         return None
 
-def fetchIndexBaseData(tickers, tradingDays):
+def fetchIndexBaseData(tickers, tradingDays, dataHandler="csv"):
     import concurrent.futures
     dataframes = []
     startDate = tradingDays[0]
@@ -86,15 +97,21 @@ def fetchIndexBaseData(tickers, tradingDays):
         for num, df in enumerate(dataframes):
             db.sql(f"create table view_{num} as select * from df")
         db.sql("SHOW TABLES;")
-        rel = db.execute(" UNION ALL ".join([f"select * from view_{num}" for num in range(len(dataframes))]))
-        return rel.fetchdf()
+        rel_expression = " UNION ALL ".join([f"select * from view_{num}" for num in range(len(dataframes))])
+        if dataHandler == "duckDb":
+            return rel_expression
+        else:
+            return db.sql(rel_expression).fetchdf()
     else:
-        return pd.DataFrame()
+        return None
 
 if __name__ == "__main__":
     tradingDays = getTradingDays(endDate=datetime.now().date()-timedelta(days=2))
     tickers = getTopUsStocksByMarketCap()
-    print(tickers)
-    df = fetchIndexBaseData(tickers, tradingDays)
-    df.to_csv("stock_market_data.csv", index=False)
-    logger.info("Data saved to stock_market_data.csv")
+    mode = "duckDb" # possible values of ('csv', 'duckDb')
+    data = fetchIndexBaseData(tickers, tradingDays, dataHandler=mode)
+    if mode == "duckDb":
+        db.execute("COPY ({}) TO 'data/stock_market_data.parquet' (FORMAT PARQUET);".format(data))
+    else:
+        data.to_csv("data/stock_market_data.csv", index=False)
+    logger.info("Data saved in data folder")

@@ -49,6 +49,24 @@ def getTopUsStocksByMarketCap(index="sp500",limit=NUM_TOP_STOCKS):
     return df["Symbol"].tolist()
 
 def fetchStockDataSafe(ticker, startDate, endDate):
+    """
+    Fetch historical stock data for a given ticker and date range, with error handling.
+
+    Parameters
+    ----------
+    ticker : str
+        The ticker symbol of the stock to fetch.
+    startDate : datetime.date
+        The start date of the date range to fetch.
+    endDate : datetime.date
+        The end date of the date range to fetch.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame containing the fetched data, with columns Date, Open, High, Low, Close, Volume, and Ticker.
+        If an error occurs while fetching the data, returns None.
+    """
     try:
         hist = yf.download(ticker, start=startDate, end=endDate)
         hist.reset_index(inplace=True)
@@ -76,6 +94,24 @@ def fetchStockDataSafe(ticker, startDate, endDate):
         return None
 
 def fetchIndexBaseData(tickers, tradingDays, dataHandler="csv"):
+    """
+    Fetch historical stock data for a given list of tickers and date range, and return a single DataFrame with all the data.
+
+    Parameters
+    ----------
+    tickers : list of str
+        A list of ticker symbols to fetch.
+    tradingDays : list of datetime.date
+        A list of trading days to fetch data for.
+    dataHandler : str, optional
+        The type of data handler to use. Defaults to "csv".
+
+    Returns
+    -------
+    pd.DataFrame or the SQL expression for dataHandler - duckdb to persist as parquet or None
+        A DataFrame containing the fetched data, with columns Date, Open, High, Low, Close, Volume, and Ticker.
+        If an error occurs while fetching the data, returns None.
+    """
     import concurrent.futures
     dataframes = []
     startDate = tradingDays[0]

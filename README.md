@@ -2,7 +2,7 @@
 Equity Index Tracker
 
 This project is my take‑home assignment for a Data Engineer interview at a SaaS startup.  
-It constructs and tracks an **equal‑weighted custom index** comprising the **top 100 US stocks by market cap**, re‑evaluated daily.
+It constructs an **equal‑weighted custom index** comprising the **top 100 US stocks by market cap**, re‑evaluated daily.
 
 ---
 

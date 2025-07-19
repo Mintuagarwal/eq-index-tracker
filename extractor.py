@@ -80,7 +80,7 @@ def fetchIndexBaseData(tickers, tradingDays, dataHandler="csv"):
     dataframes = []
     startDate = tradingDays[0]
     endDate = tradingDays[-1] + timedelta(days=1)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=10) as executor:
         futures = [executor.submit(fetchStockDataSafe, ticker, startDate, endDate) for ticker in tickers]
         for future in concurrent.futures.as_completed(futures):
             df = future.result()

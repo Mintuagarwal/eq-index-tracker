@@ -22,7 +22,7 @@ Why **Yahoo Finance**?
 Easy to Use APIs with clear objects like `Ticker`, `history`, `download`
 
 Why `DuckDB`?<br>
-I have been using duckdb (in-memory Database) a lot in my job. I not longer have the need to use pandas. Pandas's just feels slow. <br>
+I have been using duckdb (in-memory Database) a lot in my job. I no longer have the need to use pandas. Pandas's just feels slow. <br>
 And I cannot read 12 dataframe with 9 million rows, 200 columns each on a remote kernel even with 200 GBs but with duckDb I can leverage the fact that it can operate on parquets only so the kernel requirement reduces massively. <br>
 Also in future, I plan to add a **partitioning scheme** for data storage based on dates so that my index construction is faster over a certain window of days as duckDb can effeciently query the right number of parquets for construction.
 

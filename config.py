@@ -12,3 +12,4 @@ URL_MAP = {
 FILE_KEY = "stock_market_data"
 from functools import partial
 FILE_KEY_FUNC = partial("{}/{}.{}".format, DATA_FOLDER, FILE_KEY)
+DEFAULT_OUTPUT_STORE = 'outputs'

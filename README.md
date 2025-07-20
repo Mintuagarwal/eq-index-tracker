@@ -13,6 +13,10 @@ For each trading day in the past month:
 2. Select the **top 100 tickers**.
 3. Construct an **equal‑weighted index** (each stock contributes equally).
 4. Export daily index values and compositions to an Excel/Parquet output.
+5. Create Analytical information and plots with the index data generated in an excel.
+[📊 View Interactive Plot](outputs/index_performance_plot.html)
+<br>
+![Index Performance](outputs/index_performance_plot.png)
 
 ✅ **Data Source:** Yahoo Finance via `yfinance` <br>
 ✅ **Database Engine:** DuckDB (in‑memory)  <br>
